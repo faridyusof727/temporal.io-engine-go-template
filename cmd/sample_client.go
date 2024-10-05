@@ -21,11 +21,16 @@ var temporalClientSampleCmd = &cobra.Command{
 			panic(err)
 		}
 
+		logger, err := di.LoadLogger()
+		if err != nil {
+			panic(err)
+		}
+
 		temporalClient, err := client.Dial(client.Options{
 			HostPort: client.DefaultHostPort,
 		})
 		if err != nil {
-			di.Logger.ErrorF("Unable to create Temporal Client", err)
+			logger.ErrorF("Unable to create Temporal Client", err)
 		}
 		defer temporalClient.Close()
 
@@ -36,16 +41,16 @@ var temporalClientSampleCmd = &cobra.Command{
 
 		workflowRun, err := temporalClient.ExecuteWorkflow(cmd.Context(), workflowOptions, sample.SampleWorkflow)
 		if err != nil {
-			di.Logger.ErrorF("Unable to execute workflow", err)
+			logger.ErrorF("Unable to execute workflow", err)
 		}
 
 		var result string
 		err = workflowRun.Get(cmd.Context(), &result)
 		if err != nil {
-			di.Logger.ErrorF("Unable to get workflow result", err)
+			logger.ErrorF("Unable to get workflow result", err)
 		}
 
-		di.Logger.InfoF("Workflow result: %s", result)
+		logger.InfoF("Workflow result: %s", result)
 	},
 }
 

@@ -19,7 +19,7 @@ var workerCmd = &cobra.Command{
 			panic(err)
 		}
 
-		worker := worker.NewWorker(di, config)
+		worker := worker.NewWorker(di)
 		if err := worker.Start(); err != nil {
 			panic(err)
 		}
@@ -29,4 +29,3 @@ var workerCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(workerCmd)
 }
-

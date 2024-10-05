@@ -16,6 +16,7 @@ type DefaultFields struct {
 type Options struct {
 	DefaultFields *DefaultFields
 	LogPath       string
+	Level         int
 }
 
 type LoggerImpl struct {
@@ -65,6 +66,8 @@ func (l *LoggerImpl) WarnF(format string, args ...any) {
 
 func New(opts Options) (Logger, error) {
 	l := logrus.New()
+
+	l.SetLevel(logrus.Level(opts.Level))
 
 	l.SetFormatter(&logrus.JSONFormatter{
 		FieldMap: logrus.FieldMap{

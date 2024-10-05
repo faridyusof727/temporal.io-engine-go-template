@@ -1,10 +1,10 @@
 package worker
 
 import (
-	"temporal-scaffolding/pkg/config"
-	"temporal-scaffolding/pkg/di"
-	sampleWorkflow "temporal-scaffolding/workflow/sample"
 	sampleActivity "temporal-scaffolding/activity/sample"
+	"temporal-scaffolding/pkg/di"
+	"temporal-scaffolding/pkg/logger"
+	sampleWorkflow "temporal-scaffolding/workflow/sample"
 
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
@@ -12,28 +12,34 @@ import (
 
 type WorkerImpl struct {
 	di *di.DI
-	config *config.Config
 }
 
-func NewWorker(di *di.DI, config *config.Config) *WorkerImpl {
-	return &WorkerImpl{di: di, config: config}
+func NewWorker(di *di.DI) *WorkerImpl {
+	return &WorkerImpl{di: di}
 }
 
 func (w *WorkerImpl) Start() error {
-	// We could inject the logger into the client options
-	temporalClient, err := client.Dial(client.Options{})
+	l, err := w.di.LoadLogger()
 	if err != nil {
-		w.di.Logger.ErrorF("Unable to create client", err)
+		return err
+	}
+
+	// We could inject the logger into the client options
+	temporalClient, err := client.Dial(client.Options{
+		Logger: logger.NewTemporalLoggerAdapter(l.(*logger.LoggerImpl)),
+	})
+	if err != nil {
+		l.ErrorF("Unable to create client", err)
 		return err
 	}
 	defer temporalClient.Close()
 
 	// Create a new Worker.
 	wk := worker.New(temporalClient, "default", worker.Options{})
-	
+
 	// Register your Workflow Definitions with the Worker.
 	wk.RegisterWorkflow(sampleWorkflow.SampleWorkflow)
-	
+
 	// Register your Activity Definitions with the Worker.
 	sampleActivity := &sampleActivity.SampleActivity{
 		Parameter: "John Doe",
@@ -43,7 +49,7 @@ func (w *WorkerImpl) Start() error {
 	// Run the Worker
 	err = wk.Run(worker.InterruptCh())
 	if err != nil {
-		w.di.Logger.ErrorF("Unable to start Worker", err)
+		l.ErrorF("Unable to start Worker", err)
 		return err
 	}
 

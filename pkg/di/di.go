@@ -1,35 +1,33 @@
 package di
 
 import (
-	"fmt"
 	"temporal-scaffolding/pkg/config"
 	"temporal-scaffolding/pkg/logger"
 )
 
 type DI struct {
-	Logger logger.Logger
+	config *config.Config
 }
 
 func NewDI(config *config.Config) (*DI, error) {
-	// load logger
-	logger, err := loadLogger(config)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load logger: %w", err)
-	}
-
 	return &DI{
-		Logger: logger,
+		config: config,
 	}, nil
 }
 
-func loadLogger(config *config.Config) (logger.Logger, error) {
+func (d *DI) LoadConfig() (*config.Config, error) {
+	return d.config, nil
+}
+
+func (d *DI) LoadLogger() (logger.Logger, error) {
 	logger, err := logger.New(logger.Options{
 		DefaultFields: &logger.DefaultFields{
-			Program: config.App.ProgramName,
-			Team:    config.App.TeamName,
-			ENV:     config.App.ENV,
+			Program: d.config.App.ProgramName,
+			Team:    d.config.App.TeamName,
+			ENV:     d.config.App.ENV,
 		},
-		LogPath: config.Logger.LogPath,
+		LogPath: d.config.Logger.LogPath,
+		Level:   d.config.Logger.Level,
 	})
 	if err != nil {
 		return nil, err

@@ -16,7 +16,12 @@ var rootCmd = &cobra.Command{
 			panic(err)
 		}
 
-		di.Logger.InfoF("Welcome to Temporal Scaffolding")
+		logger, err := di.LoadLogger()
+		if err != nil {
+			panic(err)
+		}
+
+		logger.InfoF("Welcome to Temporal Scaffolding")
 	},
 }
 
