@@ -35,7 +35,9 @@ func (w *WorkerImpl) Start() error {
 	wk.RegisterWorkflow(sampleWorkflow.SampleWorkflow)
 	
 	// Register your Activity Definitions with the Worker.
-	sampleActivity := &sampleActivity.SampleActivity{}
+	sampleActivity := &sampleActivity.SampleActivity{
+		Parameter: "John Doe",
+	}
 	wk.RegisterActivity(sampleActivity)
 
 	// Run the Worker
