@@ -24,6 +24,11 @@ type LoggerImpl struct {
 	entry *logrus.Entry
 }
 
+// Entry implements Logger.
+func (l *LoggerImpl) Entry() *logrus.Entry {
+	return l.entry
+}
+
 // Debug implements Logger.
 func (l *LoggerImpl) Debug(args ...any) {
 	l.entry.Debug(args...)

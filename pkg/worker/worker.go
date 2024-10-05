@@ -26,7 +26,7 @@ func (w *WorkerImpl) Start() error {
 
 	// We could inject the logger into the client options
 	temporalClient, err := client.Dial(client.Options{
-		Logger: logger.NewTemporalLoggerAdapter(l.(*logger.LoggerImpl)),
+		Logger: logger.NewTemporalLoggerAdapter(l),
 	})
 	if err != nil {
 		l.ErrorF("Unable to create client", err)

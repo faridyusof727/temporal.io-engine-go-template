@@ -3,6 +3,7 @@ package cmd
 import (
 	"temporal-scaffolding/pkg/config"
 	"temporal-scaffolding/pkg/di"
+	"temporal-scaffolding/pkg/logger"
 	"temporal-scaffolding/workflow/sample"
 
 	"github.com/google/uuid"
@@ -21,16 +22,18 @@ var temporalClientSampleCmd = &cobra.Command{
 			panic(err)
 		}
 
-		logger, err := di.LoadLogger()
+		l, err := di.LoadLogger()
 		if err != nil {
 			panic(err)
 		}
 
+		temporalLogger := logger.NewTemporalLoggerAdapter(l)
 		temporalClient, err := client.Dial(client.Options{
 			HostPort: client.DefaultHostPort,
+			Logger:   temporalLogger,
 		})
 		if err != nil {
-			logger.ErrorF("Unable to create Temporal Client", err)
+			l.ErrorF("Unable to create Temporal Client", err)
 		}
 		defer temporalClient.Close()
 
@@ -41,16 +44,16 @@ var temporalClientSampleCmd = &cobra.Command{
 
 		workflowRun, err := temporalClient.ExecuteWorkflow(cmd.Context(), workflowOptions, sample.SampleWorkflow)
 		if err != nil {
-			logger.ErrorF("Unable to execute workflow", err)
+			l.ErrorF("Unable to execute workflow", err)
 		}
 
 		var result string
 		err = workflowRun.Get(cmd.Context(), &result)
 		if err != nil {
-			logger.ErrorF("Unable to get workflow result", err)
+			l.ErrorF("Unable to get workflow result", err)
 		}
 
-		logger.InfoF("Workflow result: %s", result)
+		l.InfoF("Workflow result: %s", result)
 	},
 }
 

@@ -28,8 +28,8 @@ func (t *TemporalLoggerImpl) Warn(msg string, keyvals ...interface{}) {
 	t.entry.Warn(msg, keyvals)
 }
 
-func NewTemporalLoggerAdapter(logger *LoggerImpl) TemporalLogger {
-	l := logger.entry
+func NewTemporalLoggerAdapter(logger Logger) TemporalLogger {
+	l := logger.Entry()
 
 	return &TemporalLoggerImpl{
 		entry: l,

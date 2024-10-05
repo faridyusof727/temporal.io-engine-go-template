@@ -1,6 +1,9 @@
 package logger
 
+import "github.com/sirupsen/logrus"
+
 type Logger interface {
+	Entry() *logrus.Entry
 	Info(args ...any)
 	InfoF(format string, args ...any)
 	Error(args ...any)
