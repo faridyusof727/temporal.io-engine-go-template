@@ -1,10 +1,8 @@
 package worker
 
 import (
-	sampleActivity "temporal-scaffolding/activity/sample"
 	"temporal-scaffolding/pkg/di"
 	"temporal-scaffolding/pkg/logger"
-	sampleWorkflow "temporal-scaffolding/workflow/sample"
 
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
@@ -38,13 +36,16 @@ func (w *WorkerImpl) Start() error {
 	wk := worker.New(temporalClient, "default", worker.Options{})
 
 	// Register your Workflow Definitions with the Worker.
-	wk.RegisterWorkflow(sampleWorkflow.SampleWorkflow)
+	for name, workflow := range workflows {
+		l.InfoF("Registering workflow: %s", name)
+		wk.RegisterWorkflow(workflow)
+	}
 
 	// Register your Activity Definitions with the Worker.
-	sampleActivity := &sampleActivity.SampleActivity{
-		Parameter: "John Doe",
+	for name, activity := range GetActivities(w.di) {
+		l.InfoF("Registering activity: %s", name)
+		wk.RegisterActivity(activity)
 	}
-	wk.RegisterActivity(sampleActivity)
 
 	// Run the Worker
 	err = wk.Run(worker.InterruptCh())

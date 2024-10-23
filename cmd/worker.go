@@ -3,7 +3,7 @@ package cmd
 import (
 	"temporal-scaffolding/pkg/config"
 	"temporal-scaffolding/pkg/di"
-	"temporal-scaffolding/pkg/worker"
+	"temporal-scaffolding/worker"
 
 	"github.com/spf13/cobra"
 )
